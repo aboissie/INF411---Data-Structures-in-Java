@@ -121,17 +121,24 @@ class CountConfigurationsNaive { // comptage des configurations stables
 		if(height <= 1) return 0;
 		if(height == 2) return 1;
 		
-		long s = 0;
+		long res = 0;
 		for(Row r:rows){
-			if(r.areStackable(r1, r2)) s += count(r2, r, rows, height - 1);
+			if(r.areStackable(r1, r2)) res += count(r2, r, rows, height - 1);
 		}
-		return s;
+		return res;
 	}
 
 	// renvoie le nombre de grilles à n lignes et n colonnes
 	static long count(int n) {
-		throw new Error("hello");
-	}
+		LinkedList<Row> rows = Row.allStableRows(n);
+		if (n <= 1) return rows.size();
+		long res = 0;
+		for(Row r1: rows)
+			for(Row r2: rows)
+				res += count(r1, r2, rows, n);
+
+		return res;
+    }
 }
 
 // CONSTRUCTION ET UTILISATION D'UNE TABLE DE HACHAGE
@@ -158,19 +165,23 @@ class HashTable { // table de hachage
 
 	// constructeur
 	HashTable() {
-		throw new Error("Constructeur HashTable() à compléter (Question 3.1)");
+		this.buckets = new Vector<LinkedList<Quadruple>>(M);
+		for(int i = 0; i < M; i ++){
+			this.buckets.add(new LinkedList<Quadruple>());
+		}
 	}
 
 	// Question 3.2
 
 	// renvoie le code de hachage du triplet (r1, r2, height)
 	static int hashCode(Row r1, Row r2, int height) {
-		throw new Error("Méthode hashCode(Row r1, Row r2, int height) à compléter (Question 3.2)");
+		return 13 * r1.hashCode() * r1.hashCode() + 17 * r2.hashCode() * r2.hashCode() + height;
 	}
 
 	// renvoie le seau du triplet (r1, r2, height)
 	int bucket(Row r1, Row r2, int height) {
-		throw new Error("Méthode bucket(Row r1, Row r2, int height) à compléter (Question 3.2)");
+		int mod = hashCode(r1, r2, height) % M;
+		return (mod >= 0 ? mod : mod + M);
 	}
 
 	// Question 3.3
@@ -178,14 +189,18 @@ class HashTable { // table de hachage
 	// ajoute le quadruplet (r1, r2, height, result) dans le seau indiqué par la
 	// methode bucket
 	void add(Row r1, Row r2, int height, long result) {
-		throw new Error("Méthode add(Row r1, Row r2, int height, long result) à compléter (Question 3.3)");
+		buckets.get(bucket(r1, r2, height)).add(new Quadruple(r1, r2, height, result));
 	}
 
 	// Question 3.4
 
 	// recherche dans la table une entrée pour le triplet (r1, r2, height)
 	Long find(Row r1, Row r2, int height) {
-		throw new Error("Méthode Quadruple find(Row r1, Row r2, int height) à compléter (Question 3.4)");
+		for (Quadruple q : buckets.get(bucket(r1, r2, height))) {
+			if (r1.equals(q.r1) && r2.equals(q.r2) && height == q.height)
+				return Long.valueOf(q.result);
+		}	
+		return null;
 	}
 
 }
@@ -199,21 +214,56 @@ class CountConfigurationsHashTable { // comptage des configurations stables en u
 	// dont les lignes sont des lignes de rows et dont la hauteur est height
 	// en utilisant notre table de hachage
 	static long count(Row r1, Row r2, LinkedList<Row> rows, int height) {
-		throw new Error(
-				"Méthode count(Row r1, Row r2, LinkedList<Row> rows, int height) de la classe CountConfigurationsHashTable à compléter (Question 4)");
+		if(height <= 1) return 0;
+		if(height == 2) return 1;
+		if(memo.find(r1, r2, height) != null) return memo.find(r1, r2, height);
+
+		long res = 0;
+		for(Row r:rows){
+			if(r.areStackable(r1, r2)) res += count(r2, r, rows, height - 1);
+		}
+
+		memo.add(r1, r2, height, res);
+		return res;
 	}
 
 	// renvoie le nombre de grilles a n lignes et n colonnes
 	static long count(int n) {
-		throw new Error("Méthode count(int n) de la classe CountConfigurationsHashTable à compléter (Question 4)");
+		LinkedList<Row> rows = Row.allStableRows(n);
+		if (n <= 1) return rows.size();
+		long res = 0;
+		for(Row r1: rows)
+			for(Row r2: rows)
+				res += count(r1, r2, rows, n);
+
+		return res;
 	}
 }
 
 //UTILISATION DE HASHMAP
 
 class Triple { // triplet (r1, r2, height)
-	// à compléter
-}
+	private Row r1, r2;
+	private int height;
+
+	Triple(Row r1, Row r2, int height){
+		this.r1 = r1;
+		this.r2 = r2;
+		this.height = height;
+	}
+
+	@Override
+	public boolean equals(Object o){
+		Triple that = (Triple) o;
+		return (that.height == this.height) & (that.r1.equals(this.r1)) && (that.r2.equals(this.r2));
+	}
+
+	@Override
+	public int hashCode() {
+		return 13 * r1.hashCode() * r1.hashCode() + 17 * r2.hashCode() * r2.hashCode() + height;
+	}
+};
+
 
 class CountConfigurationsHashMap { // comptage des configurations stables en utilisant la HashMap de java
 	static HashMap<Triple, Long> memo = new HashMap<Triple, Long>();
@@ -224,12 +274,29 @@ class CountConfigurationsHashMap { // comptage des configurations stables en uti
 	// dont les lignes sont des lignes de rows et dont la hauteur est height
 	// en utilisant la HashMap de java
 	static long count(Row r1, Row r2, LinkedList<Row> rows, int height) {
-		throw new Error(
-				"Méthode count(Row r1, Row r2, LinkedList<Row> rows, int height) de la classe CountConfigurationsHashMap à compléter (Question 5)");
+		if(height <= 1) return 0;
+		if(height == 2) return 1;
+		Triple t = new Triple(r1, r2, height);
+		if(memo.get(t) != null) return memo.get(t);
+
+		long res = 0;
+		for(Row r:rows){
+			if(r.areStackable(r1, r2)) res += count(r2, r, rows, height - 1);
+		}
+
+		memo.put(t, res);
+		return res;
 	}
 
 	// renvoie le nombre de grilles à n lignes et n colonnes
 	static long count(int n) {
-		throw new Error("Méthode count(int n) de la classe CountConfigurationsHashMap à compléter (Question 5)");
+		LinkedList<Row> rows = Row.allStableRows(n);
+		if (n <= 1) return rows.size();
+		long res = 0;
+		for(Row r1: rows)
+			for(Row r2: rows)
+				res += count(r1, r2, rows, n);
+
+		return res;
 	}
 }
