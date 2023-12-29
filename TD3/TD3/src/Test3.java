@@ -71,7 +71,7 @@ public class Test3 {
 		
 		// à décommenter pour la question 3.2
 		// (sans commenter la ligne précédente)
-		//test32();
+		test32();
 
 	}
 

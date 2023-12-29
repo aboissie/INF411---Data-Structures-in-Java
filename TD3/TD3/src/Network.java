@@ -1,34 +1,27 @@
-public class UnionFind {
-    int parent;
-    int rank;
-    
-
-}
+import java.util.Vector;
 
 public class Network {
     PRNG prng;
-    int success;
-    int callee; 
-    int caller;
-    
+    int success = 0;
+    int callee = -1; 
+    int caller = -1;
+    private UnionFind relations;
 
     public Network(int m){
-        this.prng = new PRNG(m);
-        this.success = 0;
-        this.callee = -1;
-        this.caller = -1;
+        prng = new PRNG(m);
+        relations = new UnionFind(m);
     }  
 
     public int getCallCount(){
-        return this.success;
+        return success;
     }
 
     public int getLastCaller(){
-        return this.caller;
+        return caller;
     }
 
     public int getLastCallee(){
-        return this.callee;
+        return callee;
     }
 
     public void oneCall(){
@@ -39,6 +32,8 @@ public class Network {
             this.success += 1;
             this.caller = caller;
             this.callee = callee;
+            
+            this.relations.union(caller, callee);
         }
     }
 
@@ -49,6 +44,26 @@ public class Network {
     }
 
     public void runUntilConnected(int u, int v){
+        while(relations.find(u) != relations.find(v)) oneCall();
+    }
+
+    public int getContactCount(int u){
+        return relations.classCardinality(u);
+    }
+
+    public static void main(String[] args){
+        int president = 524287;
+        int m = 1000000;
+        Network n = new Network(m);
+        while(n.getContactCount(president) <= (float) m * 0.01) n.oneCall();
+        System.out.println("Pour relier le président à 1 % de la population, il faut passer n = " + n.success + " appels réussis");
         
+        n = new Network(m);
+        while(n.getContactCount(president) <= (float) m * 0.5) n.oneCall();
+        System.out.println("Pour relier le président à 50 % de la population, il faut passer n = " + n.success + " appels réussis");
+
+        n = new Network(m);
+        while(n.getContactCount(president) <= (float) m * 0.99) n.oneCall();
+        System.out.println("Pour relier le président à 99 % de la population, il faut passer n = " + n.success + " appels réussis");
     }
 }
