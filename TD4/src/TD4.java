@@ -40,11 +40,10 @@ class ExtendedCell extends Cell {
 		maze.slow(); // ralentit l'animation de la recherche (pour aider à debugger)
 
 		//throw new Error("Methode searchPath() a completer (Question 1)");
-		
 		setMarked(true);
 		if(isExit()) return true;
-
-		for(Cell c : getNeighbors(false)) {
+		
+		for(Cell c:getNeighbors(false)){
 			if(!c.isMarked() && c.searchPath()) return true;
 		}
 
