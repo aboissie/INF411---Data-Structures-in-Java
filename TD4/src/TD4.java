@@ -23,6 +23,7 @@ import java.nio.file.Paths;
  * -) Génerer un labyrinthe de manière récursive
  * 
  */
+
 class ExtendedCell extends Cell {
 	
 	public ExtendedCell(Maze maze) {
@@ -58,8 +59,19 @@ class ExtendedCell extends Cell {
 	 */
 	void generateRec() {
 		maze.slow();
+		if(isExit()) return;
 
-		throw new Error("Methode generateRec() a completer (Question 2)");
+		List<Cell> neighbors = getNeighbors(true);
+		Collections.shuffle(neighbors);
+
+		for(Cell c:neighbors){
+			if(c.isIsolated()){
+				breakWall(c);
+				c.generateRec();
+			}	
+		}
+
+		return;
 	}
 
 }
@@ -85,9 +97,20 @@ class Maze {
 
 		while(!cells.isEmpty()) {
 			slow();
+			Cell c = cells.peek();
+			List<Cell> neighbors = c.getNeighbors(true);
+			Collections.shuffle(neighbors);
+			boolean pop = true;
+			for(Cell n:neighbors){
+				if(n.isIsolated()){
+					c.breakWall(n);
+					cells.add(n);
+					pop = false;
+					break;
+				}
+			}
 
-			 throw new Error("Methode generateIter() a completer (Question 3)");
-
+			if(pop) cells.pop();
 		}
 
 	}
@@ -98,8 +121,19 @@ class Maze {
 	/**
 	 * Génère un labyrinthe avec l'algorithme de Wilson
 	 */
+
+
 	void generateWilson() {
-		throw new Error("Methode generateWilson() a completer (Question 4)");
+		int i = (int) (height * Math.random());
+		int j = (int) (width * Math.random());
+
+		getCell(i, j).setMarked(true);
+		List<Coord> unmarked = this.getUnMarkedCells();
+		
+		if(unmarked.isEmpty()) return;
+
+
+		
 	}
 
 	/**
