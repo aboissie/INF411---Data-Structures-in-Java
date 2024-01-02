@@ -12,6 +12,7 @@ public abstract class Cell {
 	private boolean isExit; // si la case est la sortie du labyrinthe
 	/** liste des cases voisines de la cellule */
 	private ArrayList<Cell> neighbors; // 
+	public Cell next;
 	private ArrayList<Boolean> walls; // pour chacune des cases voisines, s'il y a un mur dans sa direction
 	protected Maze maze; // référence au labyrinthe (pour la visualisation)
 

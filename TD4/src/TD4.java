@@ -7,6 +7,7 @@
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.io.IOException;
@@ -23,6 +24,15 @@ import java.nio.file.Paths;
  * -) Génerer un labyrinthe de manière récursive
  * 
  */
+
+class Coord{
+	public int i, j;
+
+	Coord(int i, int j){
+		this.i = i;
+		this.j = j;
+	}
+}
 
 class ExtendedCell extends Cell {
 	
@@ -124,16 +134,41 @@ class Maze {
 
 
 	void generateWilson() {
-		int i = (int) (height * Math.random());
-		int j = (int) (width * Math.random());
+		// 1. Récupère toutes les cellules
+		ArrayList<Cell> cells = new ArrayList<Cell>();
+		Cell current;
+		for (Cell[] row : grid)
+			for (Cell c : row)
+				cells.add(c);
+		Collections.shuffle(cells);
+		// 2. Initialiser un labyrinthe partiel en marquant une case
+		cells.get(0).setMarked(true);
+		// 3. Tant qu'il reste une case `cell` non marquée...
+		for (Cell cell : cells) {
+			if (!cell.isMarked()) {
+				// Marche aléatoire partant de `cell`, jusqu'à tomber sur une case marquée 
+				current = cell;
+				while (!current.isMarked()) {
+					List<Cell> neighbors = current.getNeighbors(true);
+					Collections.shuffle(neighbors);
+					current.next = neighbors.get(0); 
+					current = current.next; // Si une cellule est revisitée, son  
+          //champs next est mis à jour, c'est ce qui supprime implicitement
+          //les boucles dans la seconde phase. 
+				}
+				//On parcourt le chemin en partant de `cell`: à chque étape on  casse le mur qui sépare une case de son successeur (next). 
+        //On note que le chemin ne peut pas contenir de boucles qui ne contient pas de cases non marquées, sinon on ne serait pas sorti de la boucle précédente.    
+				current = cell;
+				while (!current.isMarked()) {
+					slow();
+					current.breakWall(current.next);
+					current.setMarked(true); // Les cellules le long du chemin sont 
+          // «ajoutées au labyrinthe»
+					current = current.next;
+				}
+			}
+		}
 
-		getCell(i, j).setMarked(true);
-		List<Coord> unmarked = this.getUnMarkedCells();
-		
-		if(unmarked.isEmpty()) return;
-
-
-		
 	}
 
 	/**
