@@ -24,7 +24,6 @@ class BiDijkstra {
 		this.dest = dest;
 				
 		
-
 	}
 
 	// Question 3.1
