@@ -23,35 +23,44 @@ class BiDijkstra {
 		this.source = source;
 		this.dest = dest;
 				
-		
+		forward = new Dijkstra(g, source, dest);
+		backward = new Dijkstra(g.reverse(), dest, source);
+
+		currentDijkstra = forward;
+		otherDijkstra = backward;
+
+		last = source;
 	}
 
 	// Question 3.1
 	
 	// changer la direction de recherche
 	void flip() {
-		throw new Error("Méthode BiDijkstra.flip() à compléter (Question 3.1)");
+		Dijkstra tmp = this.currentDijkstra;
+		this.currentDijkstra = this.otherDijkstra;
+		this.otherDijkstra = tmp;
 	}
 
 	// Question 3.1
 	
 	// une iteration de Dijkstra bidirectionnel
 	void oneStep() {
-		throw new Error("Méthode BiDijkstra.oneStep() à compléter (Question 3.1)");
+		this.currentDijkstra.oneStep();
+		this.otherDijkstra.oneStep();
+		this.last = this.currentDijkstra.unsettled.peek().id;
 	}
 	
 	// Question 3.1
 	
 	// test de terminaison
 	boolean isOver() {
-		throw new Error("Méthode BiDijkstra.isOver() à compléter (Question 3.1)");
+		return this.forward.settled[this.last] && this.backward.settled[this.last];
 	}
 		
 	// Questions 3.1 et 3.2
-	
 	// renvoyer la longueur du plus cours chemin
 	int getMinPath() {
-		throw new Error("Méthode BiDijkstra.getMinPath() à compléter (Questions 3.1 et 3.2)");
+		
 	}
 	
 	// Question 3.1
