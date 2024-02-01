@@ -1,3 +1,6 @@
+<p float="left">
+  <img src="res/javaclass.jpg" width="1000", height = "250" />
+
 # INF411 - Data Structures in Java
 
 ![Project Badge](https://img.shields.io/badge/Course-École_Polytechnique-blue) ![Area Badge](https://img.shields.io/badge/Subject-Data_Structures_and_Algorithms-orange)
@@ -22,7 +25,9 @@ The primary goal of this course is to equip students with a deep understanding o
 
 ## Technologies Used
 
-![Java](https://img.shields.io/badge/Java-%23ED8B00.svg?style=for-the-badge&logo=java&logoColor=white)
+
+![Java](res/java-ar21.svg)
+
 
 ## Course Structure
 
